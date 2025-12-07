@@ -3,7 +3,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 
 MODEL_DIR = "./big5-bert-normalized-model"
 
-device = torch.device("cpu")  # or use cuda if you want and have gpu
+device = torch.device("cpu")  
 
 tokenizer = AutoTokenizer.from_pretrained(MODEL_DIR)
 model = AutoModelForSequenceClassification.from_pretrained(MODEL_DIR)
@@ -12,7 +12,6 @@ model.eval()
 
 trait_names = ["agreeableness", "openness", "conscientiousness", "extraversion", "neuroticism"]
 
-# same mins / maxs you used in training
 mins = {"agreeableness":0,"openness":9,"conscientiousness":1,"extraversion":0,"neuroticism":0}
 maxs = {"agreeableness":99,"openness":98,"conscientiousness":98,"extraversion":99,"neuroticism":99}
 
@@ -45,7 +44,6 @@ def summarize_personality(scores: dict) -> str:
         "neuroticism": "emotionally sensitive"
     }
 
-    # if neuroticism is the top one, handle a bit softer
     if top_trait == "neuroticism":
         return (
             "You seem emotionally sensitive and may experience feelings quite deeply. "
