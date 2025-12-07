@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>AI-Based Personality Prediction (Big-5)</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    >
+    <style>
+        body {
+            background: #f4f5f7;
+        }
+        .main-card {
+            max-width: 900px;
+            margin: 40px auto;
+            border-radius: 18px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+        textarea {
+            resize: vertical;
+        }
+        .trait-pill {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        .trait-pill.Low {
+            background: #ffe5e5;
+            color: #b30000;
+        }
+        .trait-pill.Medium {
+            background: #fff7d6;
+            color: #b38b00;
+        }
+        .trait-pill.High {
+            background: #e3ffe5;
+            color: #0f7b2d;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+  <div class="card main-card p-4 p-md-5">
+    <h2 class="mb-3 text-center">AI-Based Personality Prediction (Big-5)</h2>
+    <p class="text-muted text-center mb-4">
+      Paste your text (social media posts, journal entry, etc.) and get an approximate Big-5 personality profile.
+    </p>
+
+    <form method="POST" class="mb-4">
+      <div class="mb-3">
+        <label class="form-label fw-semibold">Your Text</label>
+        <textarea
+          class="form-control"
+          name="user_text"
+          rows="5"
+          placeholder="Write something about yourself, your thoughts, or your day..."
+          required>{{ user_text }}</textarea>
+      </div>
+      <div class="d-flex justify-content-center">
+        <button type="submit" class="btn btn-primary px-4">
+          Predict
+        </button>
+      </div>
+    </form>
+
+    {% if scores %}
+    <hr class="my-4">
+
+    <div class="row g-4">
+      <!-- Scores + Levels -->
+      <div class="col-md-6">
+        <h4>Predicted Traits</h4>
+        <ul class="list-group">
+          {% for trait, score in scores.items() %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <strong class="text-capitalize">{{ trait }}</strong><br>
+              <small class="text-muted">Score: {{ "%.2f"|format(score) }} / 100</small>
+            </div>
+            {% if levels %}
+              {% set lvl = levels[trait] %}
+              <span class="trait-pill {{ lvl }}">{{ lvl }}</span>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Radar chart -->
+      <div class="col-md-6">
+        <h4 class="text-center mb-3">Personality Radar</h4>
+        <canvas id="radarChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Summary -->
+    {% if summary %}
+    <div class="mt-4 p-3 bg-light rounded">
+      <h5>Summary</h5>
+      <p class="mb-0">{{ summary }}</p>
+    </div>
+    {% endif %}
+
+    {% endif %}
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  {% if scores %}
+    const traitLabels = {{ scores.keys()|list|tojson }};
+    const traitScores = {{ scores.values()|list|tojson }};
+
+    const ctx = document.getElementById('radarChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'radar',
+      data: {
+        labels: traitLabels.map(t => t.charAt(0).toUpperCase() + t.slice(1)),
+        datasets: [{
+          label: 'Score (0–100)',
+          data: traitScores,
+          fill: true,
+          borderWidth: 2,
+          pointRadius: 3
+        }]
+      },
+      options: {
+        scales: {
+          r: {
+            suggestedMin: 0,
+            suggestedMax: 100,
+            ticks: {
+              stepSize: 20
+            }
+          }
+        }
+      }
+    });
+  {% endif %}
+</script>
+</body>
+</html>
