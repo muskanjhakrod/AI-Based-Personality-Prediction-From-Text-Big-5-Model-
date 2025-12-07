@@ -50,11 +50,11 @@ screenshots/
 
 ### 🏠 Home Screen
 
-![Home screen](screenshots/home.png)
+![Home screen](Screenshots/home.png)
 
 ### 📊 Prediction Result
 
-![Prediction](screenshots/result.png)
+![Prediction](Screenshots/result.png)
 
 ---
 
